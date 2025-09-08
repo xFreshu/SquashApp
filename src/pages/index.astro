@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import PlayerManager from '../components/PlayerManager.tsx';
+import SquashApp from '../components/SquashApp.tsx';
 ---
 
 <Layout title="Squash Score App">
@@ -12,18 +12,7 @@ import PlayerManager from '../components/PlayerManager.tsx';
 			<p class="text-gray-400 mt-2">Witaj w aplikacji do liczenia punktów w squashu!</p>
 		</header>
 
-		<div id="player-section">
-			<PlayerManager client:load />
-		</div>
-
-		<!-- Sekcje dla meczu i historii pojawią się tutaj w kolejnych krokach -->
-		<div id="match-section" class="mt-12">
-			{/* Match component will go here */}
-		</div>
-
-		<div id="history-section" class="mt-12">
-			{/* Match history component will go here */}
-		</div>
+		<SquashApp client:load />
 
 	</main>
 </Layout>
