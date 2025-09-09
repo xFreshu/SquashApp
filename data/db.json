@@ -11,16 +11,5 @@
       "name": "Milfinio"
     }
   ],
-  "matches": [
-    {
-      "id": 1757404406483,
-      "createdAt": "2025-09-09T07:53:26.483Z",
-      "playerOneId": 1757404388197,
-      "playerTwoId": 1757404384680,
-      "playerOneScore": 0,
-      "playerTwoScore": 11,
-      "winnerId": 1757404384680,
-      "durationInSeconds": 1
-    }
-  ]
+  "matches": []
 }

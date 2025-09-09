@@ -88,3 +88,19 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(JSON.stringify({ message: 'Błąd podczas zapisu danych' }), { status: 500 });
   }
 };
+
+// DELETE endpoint to clear all matches
+export const DELETE: APIRoute = async () => {
+  try {
+    const db = await readDb();
+    db.matches = []; // Clear the matches array
+    await writeDb(db);
+
+    return new Response(JSON.stringify({ message: 'Historia meczów została wyczyszczona.' }), {
+      status: 200,
+    });
+  } catch (error) {
+    console.error(error);
+    return new Response(JSON.stringify({ message: 'Błąd podczas czyszczenia historii meczów' }), { status: 500 });
+  }
+};

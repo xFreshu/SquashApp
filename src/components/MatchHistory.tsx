@@ -1,14 +1,53 @@
-import React from 'react';
-import type { Match } from './SquashApp'; // Import type from the main app
+import React, { useState } from 'react';
+import type { Match } from './SquashApp';
 
 interface MatchHistoryProps {
   matches: Match[];
+  onClearHistory: () => void;
 }
 
-const MatchHistory: React.FC<MatchHistoryProps> = ({ matches }) => {
+const MatchHistory: React.FC<MatchHistoryProps> = ({ matches, onClearHistory }) => {
+  const [error, setError] = useState('');
+  const [isClearing, setIsClearing] = useState(false);
+
+  const handleClearHistory = async () => {
+    if (!window.confirm('Czy na pewno chcesz usunąć całą historię meczów? Tej operacji nie można cofnąć.')) {
+      return;
+    }
+
+    setIsClearing(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/matches', { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error('Nie udało się wyczyścić historii.');
+      }
+      onClearHistory(); // Refresh the data in the parent component
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   return (
     <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">Historia Meczów</h2>
+      <div className="flex justify-center items-center mb-4 relative">
+        <h2 className="text-2xl font-bold text-center">Historia Meczów</h2>
+        {matches.length > 0 && (
+          <button
+            onClick={handleClearHistory}
+            disabled={isClearing}
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 disabled:bg-red-800 absolute right-0"
+          >
+            {isClearing ? 'Czyszczenie...' : 'Wyczyść historię'}
+          </button>
+        )}
+      </div>
+
+      {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
       {matches.length > 0 ? (
         <div className="space-y-4">
           {matches.map((match) => (

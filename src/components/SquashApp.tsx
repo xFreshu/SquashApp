@@ -82,7 +82,7 @@ const SquashApp = () => {
     <div className="space-y-12">
       <PlayerManager players={players} onAddPlayer={handleAddPlayer} />
       <MatchManager players={players} onMatchFinish={fetchData} />
-      <MatchHistory matches={matches} />
+      <MatchHistory matches={matches} onClearHistory={fetchData} />
     </div>
   );
 };
