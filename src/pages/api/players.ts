@@ -1,52 +1,25 @@
 import type { APIRoute } from 'astro';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { PrismaClient } from '@prisma/client';
 
-// Define the path to the JSON database file
-const dbPath = path.join(process.cwd(), 'data', 'db.json');
+const prisma = new PrismaClient();
 
-// Helper function to read the database
-async function readDb() {
-  try {
-    const fileContent = await fs.readFile(dbPath, 'utf-8');
-    return JSON.parse(fileContent);
-  } catch (error: any) {
-    // If the file does not exist or is empty, return a default structure
-    if (error.code === 'ENOENT') {
-        return { players: [], matches: [] };
-    }
-    throw error;
-  }
-}
-
-// Helper function to write to the database
-async function writeDb(data: any) {
-  await fs.writeFile(dbPath, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-// GET endpoint to retrieve all players
 export const GET: APIRoute = async () => {
   try {
-    const db = await readDb();
-    // Sort players by creation date, newest first
-    const sortedPlayers = db.players.sort((a: any, b: any) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-    
-    return new Response(JSON.stringify(sortedPlayers), {
+    const players = await prisma.player.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return new Response(JSON.stringify(players), {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ message: 'Błąd podczas odczytu danych' }), { status: 500 });
+    return new Response(JSON.stringify({ message: 'Błąd podczas pobierania graczy' }), { status: 500 });
   }
 };
 
-// POST endpoint to create a new player
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const db = await readDb();
     const body = await request.json();
     const { name } = body;
 
@@ -55,24 +28,22 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const trimmedName = name.trim();
-    const existingPlayer = db.players.find((p: any) => p.name.toLowerCase() === trimmedName.toLowerCase());
+
+    const existingPlayer = await prisma.player.findUnique({
+      where: { name: trimmedName },
+    });
 
     if (existingPlayer) {
       return new Response(JSON.stringify({ message: 'Gracz o tej nazwie już istnieje' }), { status: 409 });
     }
 
-    const newPlayer = {
-      id: Date.now(), // Simple unique ID generation
-      createdAt: new Date().toISOString(),
-      name: trimmedName,
-    };
-
-    db.players.push(newPlayer);
-    await writeDb(db);
+    const newPlayer = await prisma.player.create({
+      data: { name: trimmedName },
+    });
 
     return new Response(JSON.stringify(newPlayer), { status: 201 });
   } catch (error) {
     console.error(error);
-    return new Response(JSON.stringify({ message: 'Błąd podczas zapisu danych' }), { status: 500 });
+    return new Response(JSON.stringify({ message: 'Błąd podczas tworzenia gracza' }), { status: 500 });
   }
 };
