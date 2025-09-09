@@ -89,6 +89,7 @@ const MatchManager: React.FC<MatchManagerProps> = ({ players, onMatchFinish }) =
           playerOneScore: score1,
           playerTwoScore: score2,
           winnerId: winnerId,
+          durationInSeconds: timer,
         }),
       });
 
@@ -116,19 +117,29 @@ const MatchManager: React.FC<MatchManagerProps> = ({ players, onMatchFinish }) =
     return `${mins}:${secs}`;
   };
 
+  const handlePlayer1Change = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPlayer1Id = e.target.value;
+    if (newPlayer1Id === player2Id) {
+      setPlayer2Id(''); // Reset player 2 if the same is selected
+    }
+    setPlayer1Id(newPlayer1Id);
+  };
+
   if (matchState === 'setup') {
     return (
       <div className="bg-gray-800 text-white p-6 rounded-lg shadow-lg w-full max-w-2xl mx-auto">
         <h2 className="text-2xl font-bold mb-6 text-center">Nowy Mecz</h2>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-          <select value={player1Id} onChange={e => setPlayer1Id(e.target.value)} className="bg-gray-700 p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+          <select value={player1Id} onChange={handlePlayer1Change} className="bg-gray-700 p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
             <option value="">Wybierz Gracza 1</option>
             {players.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
-          <select value={player2Id} onChange={e => setPlayer2Id(e.target.value)} className="bg-gray-700 p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-teal-500">
+          <select value={player2Id} onChange={e => setPlayer2Id(e.target.value)} className="bg-gray-700 p-3 rounded-md w-full focus:outline-none focus:ring-2 focus:ring-teal-500" disabled={!player1Id}>
             <option value="">Wybierz Gracza 2</option>
-            {players.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            {players
+              .filter(p => p.id !== parseInt(player1Id))
+              .map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
         </div>
         <button onClick={handleStartMatch} className="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-md transition duration-300 text-lg">

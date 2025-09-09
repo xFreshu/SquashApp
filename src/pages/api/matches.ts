@@ -6,14 +6,26 @@ const prisma = new PrismaClient();
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { playerOneId, playerTwoId, playerOneScore, playerTwoScore, winnerId } = body;
+
+    // --- DEBUGGING LOGS START ---
+    console.log('--- Otrzymano dane w API /api/matches ---');
+    console.log('Cały obiekt body:', body);
+    console.log('Typy danych:');
+    for (const key in body) {
+      console.log(`  - ${key}: ${typeof body[key]}`);
+    }
+    console.log('--- Koniec logów diagnostycznych ---');
+    // --- DEBUGGING LOGS END ---
+
+    const { playerOneId, playerTwoId, playerOneScore, playerTwoScore, winnerId, durationInSeconds } = body;
 
     if (
       playerOneId === undefined ||
       playerTwoId === undefined ||
       playerOneScore === undefined ||
       playerTwoScore === undefined ||
-      winnerId === undefined
+      winnerId === undefined ||
+      durationInSeconds === undefined
     ) {
       return new Response(JSON.stringify({ message: 'Brak wszystkich wymaganych danych meczu' }), {
         status: 400,
@@ -22,11 +34,12 @@ export const POST: APIRoute = async ({ request }) => {
 
     const newMatch = await prisma.match.create({
       data: {
-        playerOneId,
-        playerTwoId,
-        playerOneScore,
-        playerTwoScore,
-        winnerId,
+        playerOneId: playerOneId,
+        playerTwoId: playerTwoId,
+        playerOneScore: playerOneScore,
+        playerTwoScore: playerTwoScore,
+        winnerId: winnerId,
+        durationInSeconds: durationInSeconds,
       },
     });
 
@@ -37,6 +50,7 @@ export const POST: APIRoute = async ({ request }) => {
       },
     });
   } catch (error) {
+    console.error('!!! Błąd krytyczny w API /api/matches !!!');
     console.error(error);
     return new Response(JSON.stringify({ message: 'Błąd podczas zapisywania meczu' }), {
       status: 500,

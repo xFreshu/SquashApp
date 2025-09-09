@@ -21,14 +21,15 @@ model Player {
 }
 
 model Match {
-  id             Int      @id @default(autoincrement())
-  createdAt      DateTime @default(now())
-  playerOneId    Int
-  playerOne      Player   @relation("PlayerOneMatches", fields: [playerOneId], references: [id])
-  playerTwoId    Int
-  playerTwo      Player   @relation("PlayerTwoMatches", fields: [playerTwoId], references: [id])
-  playerOneScore Int
-  playerTwoScore Int
-  winnerId       Int
-  winner         Player   @relation("Winner", fields: [winnerId], references: [id])
+  id                Int      @id @default(autoincrement())
+  createdAt         DateTime @default(now())
+  durationInSeconds Int
+  playerOneId       Int
+  playerOne         Player   @relation("PlayerOneMatches", fields: [playerOneId], references: [id])
+  playerTwoId       Int
+  playerTwo         Player   @relation("PlayerTwoMatches", fields: [playerTwoId], references: [id])
+  playerOneScore    Int
+  playerTwoScore    Int
+  winnerId          Int
+  winner            Player   @relation("Winner", fields: [winnerId], references: [id])
 }
