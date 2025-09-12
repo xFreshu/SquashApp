@@ -1,17 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import type { Player, Match } from '../components/SquashApp.tsx';
+import { GET as getPlayers } from './api/players.ts';
+import { GET as getMatches } from './api/matches.ts';
 
-// 1. Fetch Data
+// 1. Fetch Data directly by calling API functions
 let players: Player[] = [];
 let matches: Match[] = [];
 let error = ''
 
 try {
-    // In a server-side context, we need to use an absolute URL for fetching
-    const baseUrl = Astro.url.origin;
-    const playersResponse = await fetch(`${baseUrl}/api/players`);
-    const matchesResponse = await fetch(`${baseUrl}/api/matches`);
+    const playersResponse = await getPlayers({} as any);
+    const matchesResponse = await getMatches({} as any);
 
     if (!playersResponse.ok || !matchesResponse.ok) {
         throw new Error('Nie udało się pobrać danych do statystyk.');
